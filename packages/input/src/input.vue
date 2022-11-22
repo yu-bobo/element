@@ -134,7 +134,8 @@
         hovering: false,
         focused: false,
         isComposing: false,
-        passwordVisible: false
+        passwordVisible: false,
+        emojiReg: /[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig
       };
     },
 
@@ -185,7 +186,11 @@
         type: Boolean,
         default: false
       },
-      tabindex: String
+      tabindex: String,
+      emoji: {
+        type: Boolean,
+        default: false
+      }
     },
 
     computed: {
@@ -348,8 +353,11 @@
         // hack for https://github.com/ElemeFE/element/issues/8548
         // should remove the following line when we don't support IE
         if (event.target.value === this.nativeInputValue) return;
-
-        this.$emit('input', event.target.value);
+        if (!this.emoji && typeof event.target.value === 'string') {
+          this.$emit('input', event.target.value.replace(this.emojiReg, ''));
+        } else {
+          this.$emit('input', event.target.value);
+        }
 
         // ensure native input value is controlled
         // see: https://github.com/ElemeFE/element/issues/12850
